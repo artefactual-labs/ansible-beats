@@ -1,2 +1,33 @@
 ---
 # tasks file for ansible-beats
+
+# do not quote url in apt_key (causes error)
+- name: "obtain Elastic GPG key"
+  apt_key: 
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+- name: "add Elastic repo config"
+  apt_repository:
+    repo: "deb https://artifacts.elastic.co/packages/5.x/apt stable main"
+
+- name: "Update apt cache"
+  apt: 
+    update_cache: yes 
+
+- name: "Install filebeat"
+  apt: 
+    name: filebeat
+
+- name: "template filebeat configuration"
+  template:
+    src: "etc/filebeat/filebeat.yml.j2"
+    dest: "/etc/filebeat/filebeat.yml"
+    backup: yes
+  notify:
+    - "restart filebeat"
+
+- name: "start and enable filebeat"
+  service:
+    name: "filebeat"
+    state: started
+    enabled: yes
