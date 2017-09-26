@@ -1,7 +1,9 @@
 ---
 # handlers file for ansible-beats
 
-- name: "restart filebeat"
+- name: "restart beats service"
+  with_items: "{{ beats_handler_notify.results }}"
   service:
-    name: "filebeat"
+    name: "{{ item.item }}"
     state: "restarted"
+  when: item.changed

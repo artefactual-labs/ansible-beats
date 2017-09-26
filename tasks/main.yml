@@ -14,20 +14,28 @@
   apt: 
     update_cache: yes 
 
-- name: "Install filebeat"
+- name: "Install beat package"
   apt: 
-    name: filebeat
+    name: "{{ item }}"
+  with_items: "{{ beats_beats }}"
 
-- name: "template filebeat configuration"
+- name: "template beat config file"
   template:
-    src: "etc/filebeat/filebeat.yml.j2"
-    dest: "/etc/filebeat/filebeat.yml"
+    src: "etc/{{ item }}/{{ item }}.yml.j2"
+    dest: "/etc/{{ item }}/{{ item }}.yml"
     backup: yes
+  register: beats_handler_notify
   notify:
-    - "restart filebeat"
+    - "restart beats service"
+  with_items: "{{ beats_beats }}"
+  tags:
+    - beats_config
 
-- name: "start and enable filebeat"
+- name: "start and enable beats"
   service:
-    name: "filebeat"
+    name: "{{ item }}"
     state: started
     enabled: yes
+  with_items: "{{ beats_beats }}"
+
+
