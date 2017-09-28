@@ -1,38 +1,75 @@
-Role Name
-=========
+ansible-beats
+=============
 
-A brief description of the role goes here.
+Install Elastic Beats data shippers
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+N/A
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+* beats_beats: list of beats to install
+* beats_filebeat_config: filebeat config yaml
+* beats_metricbeat_config: metricbeat config yaml
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+N/A
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+Define required variables (in the playbook or host_vars). Example:
 
+```
+beats_beats:
+  - filebeat
+  - metricbeat
+
+beats_filebeat_config:
+  filebeat.modules:
+    - module: system
+    - module: nginx
+    - module: mysql
+  output.elasticsearch:
+    hosts: ["myelasticsearchserver.example.com:9200"]
+
+beats_metricbeat_config:
+  metricbeat.modules:
+    - module: system
+      metricsets:
+        - cpu
+        - load
+        - core
+        - diskio
+        - filesystem
+        - fsstat
+        - memory
+        - network
+        - process
+        - socket
+      enabled: true
+      period: 30s
+      processes: ['.*']
+  output.elasticsearch:
+    hosts: ["myelasticsearchserver.example.com:9200"]
+```
+Example playbook:
+```
     - hosts: servers
       roles:
-         - { role: username.rolename, x: 42 }
-
+         - { role: artefactual-labs.ansible-beats, tags: ["beats"], become: "yes"}
+```
 License
 -------
 
-BSD
+AGPLv3
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Artefactual Systems
