@@ -1,2 +1,3 @@
 ---
 # defaults file for ansible-beats
+beats_apt_repo: "deb https://artifacts.elastic.co/packages/6.x/apt stable main"
